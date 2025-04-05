@@ -139,16 +139,13 @@ def generate_interactive_map(aggregated_data, style='Light'):
     return m
 
 st.write("### Interactive Map")
-df = load_data()
+df = st.session_state.df.copy()
 
 with st.container():
     location_df = load_location_coords()
     if location_df is None:
         st.error("Failed to load location coordinates.")
     else:
-
-        df = load_data()
-
         with st.container():
             location_df = load_location_coords()
             if location_df is None:

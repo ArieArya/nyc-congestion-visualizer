@@ -14,7 +14,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
-df = st.session_state.df
+df = st.session_state.df.copy()
 
 """
 Generates an interactive scatter plot of daily traffic volume vs. average temperature,

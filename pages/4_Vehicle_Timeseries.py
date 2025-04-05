@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.graph_objects as go
 from utils.data import load_data
 
-df = st.session_state.df
+df = st.session_state.df.copy()
 
 # Filter by vehicle class
 cars = df[df['Vehicle Class'] == '1 - Cars, Pickups and Vans']

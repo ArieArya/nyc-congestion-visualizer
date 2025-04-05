@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.express as px
 from utils.data import load_data
 
-df = st.session_state.df
+df = st.session_state.df.copy()
 
 top_groups = df.groupby("Detection Group")["CRZ Entries"].sum().sort_values(ascending=False).head(10).reset_index()
 

@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.express as px
 from utils.data import load_data
 
-df = st.session_state.df
+df = st.session_state.df.copy()
 
 # Group by Time Period and Vehicle Class
 grouped = df.groupby(["Time Period", "Vehicle Class"])["CRZ Entries"].sum().reset_index()

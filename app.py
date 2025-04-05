@@ -21,8 +21,8 @@ pg = st.navigation([
     st.Page("pages/3_Interactive_Map.py"),
     st.Page("pages/4_Vehicle_Timeseries.py"),
     st.Page("pages/5_Vehicle_Class_Breakdown.py"),
-    st.Page("pages/6_Traffic_TS_Analysis.py"),
+    st.Page("pages/8_Clustering_Labels.py"),
     st.Page("pages/7_Traffic_vs_Temperature.py"),
-    st.Page("pages/8_Clustering_Labels.py")
+    st.Page("pages/6_Traffic_TS_Analysis.py")
 ])
 pg.run()
