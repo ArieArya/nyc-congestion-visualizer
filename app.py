@@ -18,7 +18,7 @@ if "filtered_df" not in st.session_state:
 pg = st.navigation([
     st.Page("pages/1_Data_Explorer.py"),
     st.Page("pages/2_Top_Entries_Analytics.py"),
-    st.Page("pages/3_Heatmap_Analytics.py"),
+    st.Page("pages/3_Interactive Map.py"),
     st.Page("pages/4_Vehicle_Timeseries.py"),
     st.Page("pages/5_Vehicle_Class_Breakdown.py"),
     st.Page("pages/6_Traffic_TS_Analysis.py"),
