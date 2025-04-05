@@ -81,7 +81,7 @@ def preprocess_map_data(df, location_df):
         st.error(f"Error preprocessing map data: {e}")
         return None
 
-def generate_interactive_map(aggregated_data, style='Satellite'):
+def generate_interactive_map(aggregated_data, style='Light'):
     """Render a folium map with CRZ markers and customizable tile style."""
 
     tile_styles = {
@@ -169,13 +169,13 @@ with st.container():
                     # Layout: selectbox and centered map
                     style_choice = st.selectbox(
                         "Choose map style:",
-                        ["Satellite", "Standard", "Light", "Dark"],
+                        ["Light", "Dark","Satellite", "Standard"],
                         key="map_style_selector"
                     )
 
                     m = generate_interactive_map(aggregated_data, style=style_choice)
 
                     # Center the layout and show the map
-                    col1, col2, col3 = st.columns([0.2, 1.6, 0.2])
+                    col1, col2, col3 = st.columns([0.1, 1.8, 0.1])
                     with col2:
                         st_folium(m, width=1500, height=850)
