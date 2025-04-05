@@ -108,7 +108,7 @@ def generate_interactive_map(aggregated_data, style='Satellite'):
     selected_style = tile_styles[style]
 
     m = folium.Map(
-        location=[40.75, -73.97],
+        location=[40.7685, -73.872],
         zoom_start=12,
         tiles=selected_style['tiles'],
         attr=selected_style['attr'],
@@ -132,7 +132,7 @@ def generate_interactive_map(aggregated_data, style='Satellite'):
             """
             folium.Marker(
                 location=[row["Latitude"], row["Longitude"]],
-                popup=folium.Popup(popup_html, max_width=350),
+                popup=folium.Popup(popup_html, max_width=600),
                 icon=folium.Icon(color="blue", icon="car", prefix="fa")
             ).add_to(m)
         # if pd.notna(row["Latitude"]) and pd.notna(row["Longitude"]):
@@ -181,7 +181,6 @@ with st.container():
                     )
 
                     # Layout: selectbox and centered map
-                    st.subheader("Choose Map Style:")
                     style_choice = st.selectbox(
                         "Choose map style:",
                         ["Satellite", "Standard", "Light", "Dark"],
@@ -193,4 +192,4 @@ with st.container():
                     # Center the layout and show the map
                     col1, col2, col3 = st.columns([0.2, 1.6, 0.2])
                     with col2:
-                        st_folium(m, width=1100, height=850)
+                        st_folium(m, width=1500, height=850)
