@@ -1,6 +1,7 @@
 # Custom
 secrets.txt
 data.csv
+recording/
 
 # Editors
 .vscode/
