@@ -38,6 +38,3 @@ page_descriptions = {
 }
 
 pg.run()
-current_page = pg.current_page
-if current_page in page_descriptions:
-    st.write(f"**Description:** {page_descriptions[current_page]}")
