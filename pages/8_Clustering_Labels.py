@@ -59,7 +59,9 @@ merged_pattern = pd.merge(daily_pattern_reset, features_reset[['Toll Date', 'Clu
 merged_pattern.set_index('Toll Date', inplace=True)
 
 # Group by cluster and calculate the average hourly traffic pattern
-hour_cols = [col for col in merged_pattern.columns if isinstance(col, (int, float))]
+# Ensure hour columns are valid 0–23 and sorted
+hour_cols = [col for col in merged_pattern.columns if isinstance(col, (int, float)) and 0 <= col <= 23]
+hour_cols = sorted(hour_cols)
 cluster_profiles_line = merged_pattern.groupby('Cluster')[hour_cols].mean()
 
 # Convert to long format for Plotly
@@ -67,6 +69,11 @@ cluster_profiles_long = cluster_profiles_line.reset_index().melt(
 	id_vars='Cluster', var_name='Hour of Day', value_name='Average CRZ Entries'
 )
 cluster_profiles_long['Pattern Type'] = cluster_profiles_long['Cluster'].map(descriptive_labels)
+# Sanitize Hour of Day values (sometimes gets cast to float during melt)
+cluster_profiles_long = cluster_profiles_long[
+    cluster_profiles_long['Hour of Day'].between(0, 23)
+]
+cluster_profiles_long['Hour of Day'] = cluster_profiles_long['Hour of Day'].astype(int)
 
 # Create an interactive Plotly line chart
 fig = px.line(
@@ -85,9 +92,16 @@ fig.update_traces(hovertemplate='Hour: %{x}<br>CRZ Entries: %{y}<br>Pattern: %{t
 
 # Update layout for better readability
 fig.update_layout(
-	xaxis=dict(tickmode='linear', tick0=0, dtick=1),
-	legend_title_text='Pattern Type',
-	template='plotly_white',
+    xaxis=dict(
+        tickmode='linear',
+        tick0=0,
+        dtick=1,
+        range=[0, 23],  # 👈 Explicit x-axis bounds
+        title='Hour of Day'
+    ),
+    yaxis_title='Average CRZ Entries',
+    legend_title_text='Pattern Type',
+    template='plotly_white',
 )
 
 # Display the interactive chart in Streamlit
