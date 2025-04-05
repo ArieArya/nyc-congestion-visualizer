@@ -28,34 +28,34 @@ hourly_std = hourly_pivot.std(axis=1)
 growth_rate = daily_volume.pct_change().fillna(0)
 is_weekend = (daily_volume.index.weekday >= 5).astype(int)
 
-API_KEY = "b1b230ed8664410080803403250504"
-BASE_URL = "http://api.weatherapi.com/v1/history.json"
+# API_KEY = "b1b230ed8664410080803403250504"
+# BASE_URL = "http://api.weatherapi.com/v1/history.json"
 
     
     
-def fetch_weather(date_str, api_key=API_KEY, location="New York"):
-    params = {"key": api_key, "q": location, "dt": date_str}
-    response = requests.get(BASE_URL, params=params)
-    data = response.json()
-    forecast_day = data["forecast"]["forecastday"][0]["day"]
-    return {
-        "date": date_str,
-        "avgtemp_c": forecast_day["avgtemp_c"],
-        "avghumidity": forecast_day["avghumidity"],
-        "totalprecip_mm": forecast_day["totalprecip_mm"]
-    }
+# def fetch_weather(date_str, api_key=API_KEY, location="New York"):
+#     params = {"key": api_key, "q": location, "dt": date_str}
+#     response = requests.get(BASE_URL, params=params)
+#     data = response.json()
+#     forecast_day = data["forecast"]["forecastday"][0]["day"]
+#     return {
+#         "date": date_str,
+#         "avgtemp_c": forecast_day["avgtemp_c"],
+#         "avghumidity": forecast_day["avghumidity"],
+#         "totalprecip_mm": forecast_day["totalprecip_mm"]
+#     }
     
-unique_dates = daily_volume.index.strftime('%Y-%m-%d').unique()
-weather_records = []
-for date in unique_dates:
-    try:
-        weather_data = fetch_weather(date)
-        weather_records.append(weather_data)
-    except Exception as e:
-        print(f"Failed to fetch weather for {date}: {e}")
+# unique_dates = daily_volume.index.strftime('%Y-%m-%d').unique()
+# weather_records = []
+# for date in unique_dates:
+#     try:
+#         weather_data = fetch_weather(date)
+#         weather_records.append(weather_data)
+#     except Exception as e:
+#         print(f"Failed to fetch weather for {date}: {e}")
     
-weather_df = pd.DataFrame(weather_records)
-weather_df['Toll Date'] = pd.to_datetime(weather_df['date'], format='%Y-%m-%d')
+weather_df = pd.read_csv('data/weather.csv')
+weather_df['Toll Date'] = pd.to_datetime(weather_df['date'], format='%m/%d/%Y')
 weather_df = weather_df.set_index('Toll Date')[['avgtemp_c','avghumidity','totalprecip_mm']]
 weather_df['discomfort_index'] = weather_df['avgtemp_c'] - ((100 - weather_df['avghumidity'])/5)
     
