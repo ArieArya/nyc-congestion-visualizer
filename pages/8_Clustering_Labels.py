@@ -102,6 +102,7 @@ fig.update_layout(
     yaxis_title='Average CRZ Entries',
     legend_title_text='Pattern Type',
     template='plotly_white',
+	height = 600
 )
 
 # Display the interactive chart in Streamlit
