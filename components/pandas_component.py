@@ -1,4 +1,5 @@
 import streamlit as st
+from utils.data import load_data
 from agents.llm_pandas_agent import PandasQueryAgent
 
 # Create an instance of the pandas agent
@@ -30,7 +31,8 @@ def render_pandas_component():
             try:
                 if user_code.startswith(">>"):
                     # If prefixed with '>>', use LLM to generate pandas code
-                    pandas_query = agent.run(user_code[2:], st.session_state.filtered_df)
+                    with st.spinner("Processing..."):
+                        pandas_query = agent.run(user_code[2:], st.session_state.filtered_df)
                     st.session_state.pending_ai_code = pandas_query
                     st.rerun()
 
@@ -70,12 +72,14 @@ def render_pandas_component():
     # Reset button
     with col3:
         if st.button("Reset", use_container_width=True):
-            from utils.data import load_data
             # Reload the original dataset and clear history
             st.session_state.filtered_df = load_data()
             st.session_state.df_history = []
             st.success("Reset to original dataset.")
             st.rerun()
+
+            # Reset agent history
+            agent._reset_chat()
 
     # Placeholder column for spacing/alignment (unused)
     with col4:

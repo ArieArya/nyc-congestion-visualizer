@@ -16,6 +16,10 @@ class LLMBaseAgent(ABC):
         self.model = model
         self.max_unique_values = max_unique_values
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.chat_history = []
+
+    def _reset_chat(self):
+        self.chat_history = []
 
     def _get_column_context(self, df: pd.DataFrame) -> str:
         """
@@ -41,7 +45,12 @@ class LLMBaseAgent(ABC):
 
         return columns, snapshot, value_context
 
-    def _call_openai(self, system_message: str, user_prompt: str, max_tokens: int = 500, temperature: float = 0.3):
+    def _call_openai(self,
+        system_message: str,
+        user_prompt: str,
+        max_tokens: int = 500,
+        temperature: float = 0.3
+    ):
         """
         Send a structured prompt to OpenAI's chat model and return the raw LLM response string.
 
@@ -54,16 +63,22 @@ class LLMBaseAgent(ABC):
         Returns:
         - The generated message content as a plain string
         """
+        # Initialize chat history with system message if not yet started
+        if not self.chat_history and system_message:
+            self.chat_history.append({"role": "system", "content": system_message})
+        if user_prompt:
+            self.chat_history.append({"role": "user", "content": user_prompt})
+
         response = self.client.chat.completions.create(
             model=self.model,
-            messages=[
-                {"role": "system", "content": system_message},
-                {"role": "user", "content": user_prompt}
-            ],
+            messages=self.chat_history,
             temperature=temperature,
             max_tokens=max_tokens
         )
-        return response.choices[0].message.content.strip()
+
+        reply = response.choices[0].message.content.strip()
+        self.chat_history.append({"role": "assistant", "content": reply})
+        return reply
 
     @abstractmethod
     def run(self, prompt: str, df: pd.DataFrame) -> str:

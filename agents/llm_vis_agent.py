@@ -25,4 +25,4 @@ class VisQueryAgent(LLMBaseAgent):
         system_message += f"\\nData preview (first 5 rows):\\n{snapshot}\\n"
 
         # Call the model
-        return self._call_openai(system_message, prompt, max_tokens=200, temperature=0.2)
+        return self._call_openai(system_message, prompt, max_tokens=1000, temperature=0.2)

@@ -9,7 +9,7 @@ def render_main_component():
     st.markdown("---")
     mode = st.radio("Choose what you want to do:", ["Pandas Filter Query", "Generate a Visualization", "Q&A"], key="mode_selector", horizontal=True)
 
-    # --- Mode Selection ---
+    # Mode selection
     if mode == "Pandas Filter Query":
         render_pandas_component()
     elif mode == "Generate a Visualization":

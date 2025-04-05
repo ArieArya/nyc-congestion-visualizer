@@ -33,7 +33,8 @@ def render_visualization_component():
             try:
                 # If prefixed with '>>', use the LLM to generate Plotly visualization code
                 if vis_code.startswith(">>"):
-                    vis_code = agent.run(vis_code, st.session_state.filtered_df)
+                    with st.spinner("Processing..."):
+                        vis_code = agent.run(vis_code, st.session_state.filtered_df)
                     st.session_state.pending_ai_vis_code = vis_code
                     st.rerun()
 

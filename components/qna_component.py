@@ -21,7 +21,8 @@ def render_qna_component():
     with col1:
         if st.button("Ask", use_container_width=True):
             try:
-                answer = agent.run(user_question, st.session_state.filtered_df)
+                with st.spinner("Processing..."):
+                    answer = agent.run(user_question, st.session_state.filtered_df)
                 st.session_state.qna_answer = answer
                 st.rerun()
             except Exception as e:
