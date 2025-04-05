@@ -6,25 +6,44 @@ import polars as pl
 import json
 import pandas as pd
 from streamlit_folium import st_folium, folium_static
-# Arie's map
-# df = st.session_state.df
+import base64
+from io import BytesIO
+import matplotlib.pyplot as plt
+def generate_timeseries_plot(detection_group: str, df: pl.DataFrame) -> str:
+    """Generate a base64-encoded time series plot for a given detection group."""
+    try:
+        # Filter and group data by date
+        df_filtered = df.filter(pl.col("Detection Group") == detection_group)
+        df_grouped = (
+            df_filtered
+            .group_by("Toll Date")
+            .agg(pl.sum("CRZ Entries").alias("Total Entries"))
+            .sort("Toll Date")
+        )
 
-# df = df.groupby('Detection Region').agg({'CRZ Entries': 'sum', 'Latitude': 'first', 'Longitude': 'first'}).reset_index()
+        # Convert to pandas for plotting
+        df_pd = df_grouped.to_pandas()
+        df_pd["Toll Date"] = pd.to_datetime(df_pd["Toll Date"])
 
-# fig = px.density_mapbox(df,
-#                          lat='Latitude',
-#                          lon='Longitude',
-#                          z='CRZ Entries',
-#                          radius=10,
-#                          center=dict(lat=40.7128, lon=-74.0060),
-#                          mapbox_style="carto-positron",
-#                          title='Density of CRZ Entries Across Different Regions',
-#                          height=1000)
-# fig.update_layout(mapbox_zoom=10)
+        # Plotting
+        fig, ax = plt.subplots(figsize=(4, 2.5))
+        ax.plot(df_pd["Toll Date"], df_pd["Total Entries"], color="#2980b9", marker='o', linewidth=1)
+        ax.set_title(f"{detection_group}", fontsize=10)
+        ax.tick_params(axis='x', labelrotation=45)
+        ax.set_ylabel("Entries")
+        ax.grid(True, linestyle='--', alpha=0.5)
+        plt.tight_layout()
 
-# st.plotly_chart(fig, use_container_width=True)
+        # Convert plot to base64 image
+        buf = BytesIO()
+        plt.savefig(buf, format="png")
+        plt.close(fig)
+        buf.seek(0)
+        image_base64 = base64.b64encode(buf.read()).decode("utf-8")
+        return f'<img src="data:image/png;base64,{image_base64}" width="300">'
+    except Exception as e:
+        return f"<p>Error generating plot: {e}</p>"
 
-# Hubert's map
 @st.cache_data
 def load_location_coords():
     """Load location coordinates from detection_groups.json."""
@@ -101,44 +120,77 @@ def generate_interactive_map(aggregated_data, style='Satellite'):
 
     for _, row in aggregated_data.iterrows():
         if pd.notna(row["Latitude"]) and pd.notna(row["Longitude"]):
+            group_name = row["Detection Group"]
+            time_series_img = generate_timeseries_plot(group_name, df_map)
+
             popup_html = f"""
             <div style="font-family: 'Helvetica Neue', sans-serif; font-size: 14px;">
-                <b style="color: #2c3e50;">{row['Detection Group']}</b><br>
-                <span style="color: #16a085;">Total CRZ Entries:</span> <b>{row['CRZ Entries']}</b>
+                <b style="color: #2c3e50;">{group_name}</b><br>
+                <span style="color: #16a085;">Total CRZ Entries:</span> <b>{row['CRZ Entries']}</b><br><br>
+                {time_series_img}
             </div>
             """
             folium.Marker(
                 location=[row["Latitude"], row["Longitude"]],
-                popup=folium.Popup(popup_html, max_width=300),
+                popup=folium.Popup(popup_html, max_width=350),
                 icon=folium.Icon(color="blue", icon="car", prefix="fa")
             ).add_to(m)
+        # if pd.notna(row["Latitude"]) and pd.notna(row["Longitude"]):
+            # popup_html = f"""
+            # <div style="font-family: 'Helvetica Neue', sans-serif; font-size: 14px;">
+                # <b style="color: #2c3e50;">{row['Detection Group']}</b><br>
+                # <span style="color: #2c3e50;">Total CRZ Entries:</span> <b>{row['CRZ Entries']}</b>
+            # </div>
+            # """
+            # folium.Marker(
+                # location=[row["Latitude"], row["Longitude"]],
+                # popup=folium.Popup(popup_html, max_width=300),
+                # icon=folium.Icon(color="blue", icon="car", prefix="fa")
+            # ).add_to(m)
 
     # Add layer control for switching base maps
     # folium.LayerControl(position='topright', collapsed=False).add_to(m)
 
     return m
-
 st.write("### Interactive Map")
 df = load_data()
+
 with st.container():
     location_df = load_location_coords()
     if location_df is None:
         st.error("Failed to load location coordinates.")
     else:
-        df_map = preprocess_map_data(df, location_df)
-        if df_map is None or df_map.is_empty():
-            st.error("No valid data available for the map.")
-        else:
-            df_map_pandas = df_map.to_pandas()
 
-            aggregated_data = (
-                df_map_pandas.groupby(["Latitude", "Longitude", "Detection Group"])["CRZ Entries"]
-                .sum()
-                .reset_index()
-            )
-            col1, _ = st.columns([1, 4])  # Left column is smaller
-            with col1:
-                style_choice = st.selectbox("Choose map style:", ["Satellite", "Standard", "Light","Dark"])
-            # Generate and display the map
-            m = generate_interactive_map(aggregated_data, style=style_choice)
-            folium_static(m)
+        df = load_data()
+
+        with st.container():
+            location_df = load_location_coords()
+            if location_df is None:
+                st.error("Failed to load location coordinates.")
+            else:
+                df_map = preprocess_map_data(df, location_df)
+                if df_map is None or df_map.is_empty():
+                    st.error("No valid data available for the map.")
+                else:
+                    df_map_pandas = df_map.to_pandas()
+
+                    aggregated_data = (
+                        df_map_pandas.groupby(["Latitude", "Longitude", "Detection Group"])["CRZ Entries"]
+                        .sum()
+                        .reset_index()
+                    )
+
+                    # Layout: selectbox and centered map
+                    st.subheader("Choose Map Style:")
+                    style_choice = st.selectbox(
+                        "Choose map style:",
+                        ["Satellite", "Standard", "Light", "Dark"],
+                        key="map_style_selector"
+                    )
+
+                    m = generate_interactive_map(aggregated_data, style=style_choice)
+
+                    # Center the layout and show the map
+                    col1, col2, col3 = st.columns([0.2, 1.6, 0.2])
+                    with col2:
+                        st_folium(m, width=1100, height=850)
