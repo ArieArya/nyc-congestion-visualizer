@@ -12,7 +12,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 import requests
 
-df = load_data()
+df = st.session_state.df
 
 # Ensure 'Toll Date' is datetime
 df['Toll Date'] = pd.to_datetime(df['Toll Date'], format='%m/%d/%Y')

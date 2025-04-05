@@ -49,7 +49,7 @@ def generate_timeseries_plot(detection_group: str, df: pl.DataFrame) -> str:
 def load_location_coords():
     """Load location coordinates from detection_groups.json."""
     try:
-        with open("data\detection_groups.json", "r") as f:
+        with open("data/detection_groups.json", "r") as f:
             location_coords = json.load(f)
 
         location_df = pl.DataFrame(
