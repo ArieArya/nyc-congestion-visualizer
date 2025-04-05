@@ -109,8 +109,8 @@ def generate_interactive_map(aggregated_data, style='Satellite'):
     selected_style = tile_styles[style]
 
     m = folium.Map(
-        location=[40.7685, -73.872],
-        zoom_start=15,
+        location=[40.7385, -73.9422],
+        zoom_start=13.2,
         tiles=selected_style['tiles'],
         attr=selected_style['attr'],
         width='100%',        # or a fixed size like '1200px'
