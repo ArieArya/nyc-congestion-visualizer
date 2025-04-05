@@ -10,6 +10,7 @@ class VisQueryAgent(LLMBaseAgent):
         system_message = (
             "You are an assistant that generates Python visualization code using Plotly.\\n"
             "Use Plotly Express and set layout height to at least 600 pixels\\n"
+			"If generating a density_mapbox, use the 'carto-positron' mapbox_style\\n"
             "The dataset will involve MTA congestion relief zones in NYC (beginning 2025).\\n"
             "Assume the DataFrame is named 'filtered_df'.\\n"
             "Your code MUST create a Plotly figure object named `fig`. Do not do fig.show() afterwards.\n"

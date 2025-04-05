@@ -6,7 +6,7 @@ agent = PandasQueryAgent()
 
 def render_pandas_component():
     # Section header and usage instructions
-    st.subheader("🧮 Pandas filter query")
+    st.subheader("🔎 Pandas filter query")
     st.markdown("Example: `filtered_df = filtered_df[filtered_df['Vehicle Class'] == 'TLC Taxi/FHV']`")
 
     # If AI previously generated code, prefill it into the text area
