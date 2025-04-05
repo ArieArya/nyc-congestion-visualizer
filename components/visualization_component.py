@@ -7,7 +7,7 @@ agent = VisQueryAgent()
 def render_visualization_component():
     # Section header and instructions
     st.subheader("📊 Data Visualization")
-    st.markdown("The code must generate a figure `fig` using Plotly")
+    st.markdown("The code must generate a figure `fig` using Plotly.")
 
     # If AI previously generated visualization code, prefill it into the text box
     if "pending_ai_vis_code" in st.session_state:
