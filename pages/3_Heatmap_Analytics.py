@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.express as px
 from utils.data import load_data
 
-df = load_data()
+df = st.session_state.df
 
 df = df.groupby('Detection Region').agg({'CRZ Entries': 'sum', 'Latitude': 'first', 'Longitude': 'first'}).reset_index()
 
